@@ -103,9 +103,27 @@ More concretely terms of what has distributions and what doesn't, we could class
 
 This neural network is vanilla with no uncertainty at all. We have no probability assumptions about our data. We merely want some function $f$ that maps our data from $X \rightarrow Y$. 
 
+
+**Summary**
+
+* Very expressive architectures
+* Training yields the best model parameters
+* Cannot quantify the output uncertainty or confidence
+
 ## Probabilistic Neural Networks (PNN)
 
 This class of neural networks are very cheap to produce. They basically attach a probability distribution on the final layer of the network. They don't have any probability distributions on and of the weights of the network. Another way to think of it is as a feature extractor that maps all of the data to a . Another big difference is the training procedure. Typically one would have to use a log-likelihood estimation but this isn't always necessary for PNN with simpler assumptions.
+
+### Learning: Maximum Likelihood
+
+Given some training data $D=(X_i, Y_i), i=1,2,\ldots,N$, we want to learn the parameters $W$ by maximizing the log likelihood i.e.
+
+$$
+\begin{aligned}
+W^*&= \underset{W}{\text{argmax}} \log p(D|W) \\
+\log p(D|W) &= \sum_{i=1}^N \log p(Y_i|X_i,W)
+\end{aligned}
+$$
 
 ### Final Layer
 
@@ -114,6 +132,17 @@ This network is the simplest to implement: add a distribution as the final layer
 $$\mathcal{N}(\mu(x), \sigma)$$
 
 where $\mu$ is our point estimate and $\sigma$ is a **constant** noise parameter. Notice how the only parameter in our distribution is the mean function $\mu$. We assume that the $\sigma$ parameter is constant across every $\mu(x_i)$. This is known as a homoscedastic model. In this [blog post]() they classified this as a **known knowns**. When training, we can use the negative log-likelihood or the mean absolute squared loss function. In terms of applicability, this model won't be so difficult to train but it isn't the most robust model because in the real world, we won't find such a simple noise assumption. But it's a cheap way to add some uncertainty estimates to your predictions.
+
+**Regression**
+
+$$p($$
+
+**Summary**
+
+* Extends deterministic DNN to produce an output distribution, $p(y|x)$
+* Uses maximum likelihood estimation to obtain the best model
+* It is still time consuming training and can still overfit
+* It can only quantify data uncertainty (aleatoric) 
 
 ### Heteroscedastic Noise Model
 
@@ -160,6 +189,10 @@ Benchmark Repos:
 
 * [Regression with Probabilistic Layers in TensorFlow Probability](https://medium.com/tensorflow/regression-with-probabilistic-layers-in-tensorflow-probability-e46ff5d37baf)
 * [Variational Inference for Bayesian Neural Networks](http://krasserm.github.io/2019/03/14/bayesian-neural-networks/) (2019) | TensorFlow
+* Brenden Hasz
+	* [Bayesian Regressions with MCMC or Variational Bayes using TensorFlow Probability](https://brendanhasz.github.io/2018/12/03/tfp-regression.html)
+	* [Bayesian Gaussian Mixture Modeling with Stochastic Variational Inference](https://brendanhasz.github.io/2019/06/12/tfp-gmm.html)
+	* [Trip Duration Prediction using Bayesian Neural Networks and TensorFlow 2.0](https://brendanhasz.github.io/2019/07/23/bayesian-density-net.html)
 * Yarin Gal
 	* [What My Deep Model Doesn't Know...](http://www.cs.ox.ac.uk/people/yarin.gal/website/blog_3d801aa532c1ce.html)
 * High Level Series of Posts
@@ -181,8 +214,11 @@ Benchmark Repos:
 * Uncertainty Decomposition in BNNs with Latent Variables - [arxiv](https://arxiv.org/abs/1706.08495)
 * Practical Deep Learning with Bayesian Principles - [arxiv](https://arxiv.org/abs/1906.02506)
 * Pathologies of Factorised Gaussian and MC Dropout Posteriors in Bayesian Neural Networks - Foong et. al. (2019) - [Paper]()
+* Probabilistic Numerics and Uncertainty in Computations - [Paper](https://arxiv.org/pdf/1506.01326.pdf)
+* Bayesian Inference of Log Determinants - [Paper](https://arxiv.org/pdf/1704.01445.pdf)
 
 **Code**
 
+* [A Regression Master Class with Aboleth](https://aboleth.readthedocs.io/en/stable/tutorials/some_regressors.html) 
 * BNN Implementations - [Github](https://github.com/JavierAntoran/Bayesian-Neural-Networks)
 * A Comprehensive Guide to Bayesian CNN with Variational Inference - Shridhar et al. (2019) - [Github](https://github.com/kumar-shridhar/PyTorch-BayesianCNN)
