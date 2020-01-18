@@ -9,8 +9,9 @@
 This is the working group page for exploring Bayesian Neural Networks
 
 
+## Supplementary Materials
 
-### Logistics
 
-**Time**
+* [**Python Software Guide**](./code/software.md) 
+  * [TensorFlow](./code/tensorflow.md)
 

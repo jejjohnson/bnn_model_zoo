@@ -3,6 +3,141 @@
 TensorFlow is by far the most popular deep learning framework to date. It is the preferred choice in production and it is also still widely used in research. TensorFlow itself is actually written in C++ (and CUDA) but there are various APIs that allow you to call those functions with other languages like Python, Swift, Go and JavaScript. 
 
 ---
+
+## From TF 1.X to TF 2.X
+
+If you are already familiar with TF1.X, there are some key things you need to know about what has changed since TF2.X. The original TensorFlow (TF1.X) wasn't wasn't very pythonic even though the API was in Python. You had to define the graphs statically which required you to compile your graph before running it. This took us back to the C++ days where we have to compile-run-modify-repeat. In addition if something went wrong, we didn't have the training to be able to decipher the error messages. So on the plus side, if you could gain control of TF back then, you had to know what you were doing. It wasn't so easy. But on the other hand, most people programming were not computer scientists so naturally their code was very messy and very difficult to read. There wasn't a very good standard and so "reproducible code" was a nightmare to go through; *very similar to "reproducible MATLAB" code because people do not tend to follow any set standard...except maybe spaghetti*. Later they added eager execution which allowed you to define parts of your graph dynamically and then run them as you add more parts without needing to compile it. This was much better and it became easier to use TF without needing to worry about graphs. 
+
+In tandem, a library called keras was gaining popularity. This library was basically a wrapper to hide all of the 'boilerplate code' so that a different class of users (beginners) can get started without needing to be bothered with the details. TF2.X is a more
+
+### Model Building
+
+There is an example below to demonstrate the readability aspect for defining a simple linear regression model. 
+
+<!-- tabs:start -->
+
+#### ** TF 1.X - Static **
+
+```python
+# Create Graph
+lr_graph = tf.Graph()
+
+with lr_graph.as_default():
+    x = tf.placeholder(name="x", dtype=tf.float)
+    y = tf.placeholder(name="y", dtype=tf.float)
+
+    # WEIGHTS
+    w_init = tf.random_normal_initializer()
+    w = tf.Variable(
+        initial_value=w_init(shape=(units,), dtype=tf.float32),
+        name="w"
+    )
+    # BIAS
+    b = tf.Variable(
+        initial_value=w_init(shape=(units,), dtype=tf.float32),
+        name="b"
+    )
+    # MODEL OPERATIONS
+    y_hat = tf.add(tf.matmul(x, w), b)
+    loss = tf.reduce_mean(tf.squared(y - y_hat))
+
+    optimizer = tf.train.GradientDescentOptimizer(lr).minimize(loss)
+```
+
+#### ** TF 2.X - Dynamic **
+
+```python
+class LinearRegression(tf.keras.model):
+    def __init__(self, units=32, input_dim=32):
+        super().__init__()
+        # WEIGHTS
+        w_init = tf.random_normal_initializer()
+        self.w = tf.Variable(
+            initial_value=w_init(shape=(input_dim, units), dtype='float32'),
+            trainable=True
+        )
+        # BIAS
+        self.b = tf.Variable(
+            initial_value=w_init(shape=(units,), dtype='float32'),
+            trainable=True
+        )
+    
+    def call(self, x):
+        return tf.matmul(inputs, self.w) + self.b
+```
+<!-- tabs:end -->
+
+**Source**: [Medium Post](https://medium.com/red-buffer/tensorflow-1-0-to-tensorflow-2-0-coding-changes-636b49a604b)
+
+Notice that the main difference is that the default TF1.X has to define all of the operations as a graph before doing anything else. Whereas TF2.X, there is no need to do that. In addition, the keras API is closely linked to the TF library so they encourage you to use the standard model creation as shown by the documentation.
+
+### Model Training
+
+Training was a different story. For the original TF1.X you had to create a session and then all of the gradients optimization had to go through that session. It was a pain because it was necessary for everything but it basically had to follow through the code if there were any crazy training procedures. I've seen many cases where there are wild and rogue sessions that I have to keep track of in order to follow what the users were doing. In TF2.X, there are no sessions. Just a `gradientTape` which tracks the final outputs and the final weights. And if you want the gradients, ask for them. That's it. Simple. 
+
+I have included a minimal training example to showcase the major difference between TF1.X and TF2.X.
+
+<!-- tabs:start -->
+
+#### ** TF 1.X - Static **
+
+```python
+# Create session
+with tf.Session(graph=lr_graph) as sess:
+
+    # Initialize all variables
+    init = tf.global_variables_initializer()
+    sess.run(init)
+
+    # Training Loop
+    for iepoch in range(epochs):
+        
+        # Run optimization in session 
+        feed_dict = {x: Xtrain, y: ytrain}
+        sess.run(
+            optimizer,
+            feed_dict=feed_dict
+        )
+
+        # get losses
+        loss, acc = sess.run(
+            [loss_func, accuracy_func],
+            feed_dict=feed_dict
+        )
+```
+
+#### ** TF 2.X - Dynamic **
+
+```python
+for iepoch in range(epochs):
+    with tf.GradientTape() as tape:
+
+        # Forward pass
+        ypreds = lr_model(Xtrain)
+
+        # Loss 
+        loss = loss_func(y, ypreds)
+
+    # compute gradients
+    gradients = tape.gradient(loss, lr_model.trainable_weights)
+
+    # update weights of linear layer 
+    optimizer.apply_gradients(zip(gradients, model.trainable_weights))
+
+    # update accuracy 
+    acc_func.update_state(y, ypreds)
+```
+<!-- tabs:end -->
+
+**Source:** [Easy TensorFlow](https://github.com/easy-tensorflow/easy-tensorflow/blob/master/2_Linear_Classifier/Tutorials/1_Linear_Classifier.ipynb)
+
+There are some more changes which you can read [here](https://www.tensorflow.org/guide/effective_tf2). 
+
+### My Final Thoughts
+
+The biggest change I would say is the code standard and the clear spectrum of user cases. They are really promoting the `keras` way of defining `Layers`, `Models`, etc but you could also use `Sequential` or `Functional`. The rules are not absolute but this does set a nice "standard way to do things". This is a **good thing**. It's pythonic and readable. Some people are researchers and scientists whereas other people are computer scientists. But typically we'll be reading ML peoples code so we need a standard. That is if we plan on being a community and sharing. So I don't think we should spend time fighting DL libraries and reading sloppy code. We can spend more time devloping and solving more problems. One could argue that all of the details are hidden now and this promotes people just using stuff without understanding. But they're actually just optional to see. You can code from scratch if you want to. And yes, there will be many cases of people using models that they don't understand. But that's a choice and there will be barriers to prevent those people from thriving in the community. I personally think the changes are good and we shall see what the future holds for TF and DL software in general.
+
+---
 ### My Favourite Resources
 
 These are my favourite resources. I've gone through almost all of them and I found that they did the best at explaining how to use TensorFlow. 
