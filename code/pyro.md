@@ -1,16 +1,13 @@
-# Software
+# Pyro
+
+---
+## Recommended Resources
 
 
-## PyTorch
+## Tutorials
 
-**Tutorials**
 
-* [Grokking-PyTorch](https://github.com/Kaixhin/grokking-pytorch)
-* [VAE in PyTorch, commended and Annotated](https://vxlabs.com/2017/12/08/variational-autoencoder-in-pytorch-commented-and-annotated/)
-
-## Pyro
-
-**Tutorials**
+## Sample Code
 
 * [Pyro Docs](http://pyro.ai/examples/)
 * [Probabilistic Programming with VI: Under the Hood](http://willcrichton.net/notes/probabilistic-programming-under-the-hood/)
