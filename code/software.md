@@ -18,7 +18,9 @@ Before we get into the software, I just wanted to quickly define deep learning. 
 
 > Deep Learning is a collection of tools to build complex modular differentiable functions.
 
-These definitions are more or less the same: deep learning is a tool to facilitate gradient-based optimization scheme for models. The data we use, the exact way we construct it, and how we train it aren't really in the definition. So in terms of DL software, we need only a few components:
+These definitions are more or less the same: deep learning is a tool to facilitate gradient-based optimization scheme for models. The data we use, the exact way we construct it, and how we train it aren't really in the definition. Most people might think a DL tool is the ensemble of different neural networks like [these](https://pbs.twimg.com/media/EOWJc2KWsAA8xDF?format=jpg&name=4096x4096). But from henceforth, I refer to DL in the terms of facilitating the development of those neural networks, not the network library itself.
+
+So in terms of DL software, we need only a few components:
 
 * Tensor structures
 * Automatic differentiation (AutoGrad)
@@ -35,6 +37,7 @@ Anything built on top of that can be special cases where we need special structu
 Francios Chollet (the creator of `keras`) has been very vocal about the benefits of how TensorFlow caters to a broad audience ranging from applied users and algorithm developers. Both sides of the audience have different needs so building software for both audiences can very, very challenging. Below I have included a really interesting figure which highlights the axis of operations.
 
 <p align="center">
+
   <img src="https://keras-dev.s3.amazonaws.com/tutorials-img/spectrum-of-workflows.png" alt="drawing" width="800"/>
 </p>
 
@@ -48,7 +51,7 @@ As shown, there are two axis which define one way to split the DL software style
 
 So there are many more special cases but by now you can imagine that most general cases can be found on the graph. I would like to stress that designing software to do all of these cases is not easy as these cases require careful design individually. It needs to be flexible.
 
-Maybe I'm old school, but I like the modular way of design. So in essence, I think we should design libraries that focus on one aspect and do it well. I also like a standard practice and integration so that everything can fit together in the end and we can transfer information or products from one part to another. This is similar to how the Japanese revolutionized building cars by having one machine do one thing at a time and it all fit together via a standard assembly line. So in the end, I want people to be able to mix and match as they see fit. To try to please everyone ("*one DL library to rule them all*") seems a bit silly in my opinion because you're spreading out your resources. But then again, I've never built software from scratch, so what do I know? I'm just one user...in a sea of many.
+Maybe I'm old school, but I like the modular way of design. So in essence, I think we should design libraries that focus on one aspect, one audience and do it well. I also like a standard practice and integration so that everything can fit together in the end and we can transfer information or products from one part to another. This is similar to how the Japanese revolutionized building cars by having one machine do one thing at a time and it all fit together via a standard assembly line. So in the end, I want people to be able to mix and match as they see fit. To try to please everyone with "*one DL library that rules them all*" seems a bit silly in my opinion because you're spreading out your resources. But then again, I've never built software from scratch and I'm not a mega coorperation like Google or Facebook, so what do I know? I'm just one user...in a sea of many.
 
 > With great power, comes great responsibility - Uncle Ben
 
@@ -57,21 +60,27 @@ On a side note, when you build popular libraries, you shape how a massive amount
 ---
 ## Convergence of the Libraries
 
-Originally, there was a lot of differences between the deep learning libraries but now they are all starting to converge or at least have similar ways of constructing models and training. Below is a quick example of 4 deep learning libraries. If you know your python DL libraries trivia, try and guess which library do you think it is. Click on the details below to find out the answer.
+Originally, there was a lot of differences between the deep learning libraries, e.g. `static` v.s. `dynamic`, `Sequential` v.s. `Subclass`. But now they are all starting to converge or at least have similar ways of constructing models and training. Below is a quick example of 4 deep learning libraries. If you know your python DL libraries trivia, try and guess which library do you think it is. Click on the details below to find out the answer.
 
 <p align="center">
   <img src="https://pbs.twimg.com/media/DppB0xJUUAAjGi-?format=jpg&name=4096x4096" alt="drawing" width="800"/>
 </p>
 
-
 **Photo Credit**: Francois Chollet [Tweet](https://twitter.com/fchollet/status/1052228463300493312/photo/1)
 
+**Answer here**:
 <details>
-1. Upper Left - Gluon 
-2. Upper Right - TensorFlow
-3. Lower Left - PyTorch
-4. Lower Right - Chainer
+
+|         |            |
+|---------|------------|
+| Gluon   | TensorFlow |
+| PyTorch | Chainer    |
+
+
 </details>
+
+It does begs the question: if all of the libraries are basically the same, why are their multiple libraries? That's a great question and I do not know the answer to that. I think options are good as competition generally stimulates innovation. But at some point, there should be a limit no? But then again, the companies backing each of these languages are quite huge (Google, Microsoft, Uber, Facebook, etc). So I'm sure they have more than enough employees to justify the existence of their own library. But then again, imagine if they all put their efforts into making one great library. It could be an epic success! Or an epic disaster. I guess we will never know.
+
 
 ---
 ## So what to choose?
@@ -90,9 +99,11 @@ I have a personal short list below just from observations, trends and reading bu
 
 **Deep Learning Researcher** - [PyTorch](https://pytorch.org/)
 
-> If you're doing research, then I suggest you use PyTorch. It is currently the most popular library for doing ML research. If you're looking at many of the SOTA algorithms, you'll find most of them being written in PyTorch these days.
+> If you're doing research, then I suggest you use PyTorch. It is currently the most popular library for doing ML research. If you're looking at many of the SOTA algorithms, you'll find most of them being written in PyTorch these days. The API is similar to TensorFlow so you can easily transfer your skills to TF if needed.
 
-**Production** - [TensorFlow]()
+**Production/Industry** - [TensorFlow](https://www.tensorflow.org/)
+
+> TensorFlow holds the market in production. By far. So if you're looking to go into industry, it's highly likely that you'll be using TensorFlow. There are still a lot of researchers that use TF too. Fortunately, the API is similar to PyTorch if you use the subclass system so the skills are transferable.
 
 !> **Warning**: The machine learning community changes rapidly so any trends you observe are extremely volatile. Just like the machine learning literature, what's popular today can change within 6 months. So don't ever lock yourself in and stay flexible to cope with the changes. But also don't jump on bandwagons either as you'll be jumping every weekend. Keep a good balance and maintain your mental health.
 
@@ -125,13 +136,17 @@ This is a special library for SOTA GPs that's built on top of TF. It is the succ
 
 ---
 
-#### [PyTorch]()
+#### [PyTorch](https://pytorch.org/)
 
+This is the most popular DL library for the machine learning community. Backed by Facebook, this is a rather new library that came out 2 years ago. It took a bit of time, but eventually people started using it more and more especially in a research setting. The reason is because it is very pythonic, it was designed by researchers and for researchers, and it keeps the design simple even sacrificing speed if needed. If you're starting out, most people will recommend you start with PyTorch.
 
-**[Pyro]()**
+**[Pyro](https://pyro.ai/)**
 
+This is a popular Bayesian DL library that is built on top of PyTorch. Backed by Uber, you'll find a lot of different inference scheme. This library is a bit of a learning curve because their API. But, their documentation and tutorial section is great so if you take your time you should pick it up. Unfortunately I don't find too many papers with Pyro code examples, but when the Bayesian community gets bigger, I'm sure this will change.
 
-**[GPyTorch]()**
+**[GPyTorch](https://gpytorch.ai/)**
+
+This is the most scalable GP library currently that's built on top of PyTorch. They mainly use Matrix-Vector-Multiplication strategies to scale exact GPs up to 1 million points using multiple GPUs. They recently just revamped their documentation as well with many examples. If you plan to put GPs in production, you should definitely check out this library. 
 
 
 **[fastai](https://docs.fast.ai/)**
@@ -160,7 +175,10 @@ Amazon
 
 **[Theano]()**
 
+maintained by the PyMC3 developers.
+
 **[PyMC3]()** & **[PyMC4]()**
+
 
 **[CNTK]()**
 
