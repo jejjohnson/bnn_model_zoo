@@ -76,6 +76,9 @@ This is not a beginners working group so there will be some expectations from th
 * [Papers](./theory/papers.md)
 * [SOTA](./theory/sota.md)
 
+**Resources**
+* [Videos](./other/videos.md)
+
 **Software**
 * DL Frameworks
   * [Overview](./code/overview.md) 

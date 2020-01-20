@@ -4,6 +4,9 @@
 **Literature**
 * [Papers](theory/papers.md)
 
+**Resources**
+* [Videos](other/videos.md)
+
 **Explorers Groups**
 * [For not so Dummies](other/explorers_2020_01_tf.md)
 
