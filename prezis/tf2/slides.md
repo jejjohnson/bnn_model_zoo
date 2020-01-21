@@ -12,15 +12,14 @@ J. Emmanuel Johnson
 ----
 
 
-> Deep Learning is a methodology: building a model by assembling parameterized modules into (possibly dynamic) graphs and optimizing it with gradient-based methods. 
+> Deep Learning is a methodology: building a model by assembling parameterized modules into (possibly dynamic) graphs and optimizing it with gradient-based methods. - Yann LeCun
 
-Yann LeCun [tweet](https://twitter.com/ylecun/status/1215286749477384192)
+
 
 ----
 
-> Deep Learning is a collection of tools to build complex modular differentiable functions.
+> Deep Learning is a collection of tools to build complex modular differentiable functions. - Danilo Rezende
 > 
-Danilo Rezende - [tweet](https://twitter.com/DeepSpiker/status/1209862283368816641)
 
 ----
 
@@ -68,7 +67,7 @@ I want to implement a Neural Network with convolutional layers and a noise contr
 
 ----
 
-> One DL library to rule them all...!
+> One Deep Learning library to rule them all...!
 
 Probably a bad idea...
 
@@ -93,14 +92,8 @@ Probably a bad idea...
 * Simple (Pythonic) <!-- .element: class="fragment" data-fragment-index="1" -->
 * Great API <!-- .element: class="fragment" data-fragment-index="2" -->
 * Performance vs Productivity Tradeoff <!-- .element: class="fragment" data-fragment-index="3" -->
+* Easy to Install... <!-- .element: class="fragment" data-fragment-index="4" -->
 
-----
-#### TensorFlow - Identity Changes
-
-* Layers <!-- .element: class="fragment" data-fragment-index="1" -->
-* Slim <!-- .element: class="fragment" data-fragment-index="2" -->
-* Estimators <!-- .element: class="fragment" data-fragment-index="3" -->
-* Keras <!-- .element: class="fragment" data-fragment-index="4" -->
 
 ----
 #### Game: Which Library?
@@ -111,12 +104,19 @@ Probably a bad idea...
 
 
 ----
-#### My Suggestions?
+#### My Suggestions
 
-* Producivity: **Fastai** <!-- .element: class="fragment" data-fragment-index="1" -->
+* Productivity: **Fastai** <!-- .element: class="fragment" data-fragment-index="1" -->
 * From Scratch: **JAX** <!-- .element: class="fragment" data-fragment-index="2" -->
 * Research: **PyTorch** <!-- .element: class="fragment" data-fragment-index="3" -->
 * Production/Industry: **TensorFlow** <!-- .element: class="fragment" data-fragment-index="4" -->
+
+---
+## Basics
+
+* Tensors
+* Variables
+* Automatic differentiation (AutoGrad)
 
 
 ---
@@ -177,6 +177,9 @@ initial_value = tf.random.normal(shape=(2, 2))
 a = tf.Variable(initial_value)
 ```
 
+* Options (constraint, trainable, shape)
+* All math operations
+
 ----
 
 #### Updates
@@ -200,8 +203,26 @@ a.assign_sub(new_a)
 
 ## Gradients
 
-* **New**: `GradientTape` 
-* Defines the scope 
+
+----
+
+#### Gradient Function
+
+```python
+# init variable
+a = tf.Variable(init_value)
+# do operation
+c = tf.sqrt(tf.square(a) + tf.square(b))
+# calculate gradient ( dc/da )
+dc_da = tf.gradients(c, a)
+# calculate multiple gradients
+dc_da, dc_db = tf.gradients(c, [a, b])
+```
+
+----
+
+* **New**: `GradientTape`
+* Defines the scope
 * literally "record operations"
 
 ----
@@ -238,17 +259,37 @@ with tf.GradientTape() as outer_tape:
     d2c_da2 = outer_tape.gradient(dc_da, a)
 ```
 
+---
+
+### Gradients in PyTorch
+
+* Same gradient function `torch.autograd.grad`
+* There is no `Tape`
+* Each variable has their own gradient
+
+----
+
+```python
+# init variable
+a = torch.tensor(init_value, requires_grad=True)
+# do operation
+c = math.sqrt(a ** 2 + b ** 2)
+# calculate gradients ( dc/da )
+c.backward(a)
+# extract gradients
+dc_da = a.grad
+```
 
 ---
 
-## Engine Module
+## TF: Engine Module
 
 * `Layer`
 * `Network` - DAG graph
 * `Model`
 * `Sequential` 
 
----
+----
 
 #### Various Subclasses
 
@@ -370,6 +411,28 @@ class Linear(tf.keras.Layer):
 ```
 
 ----
+#### PyTorch (the same...)
+
+```python
+class Linear(nn.Module):
+    def __init__(self, units: int, input_dim: int):
+        super().__init__()
+        # weight 'matrix'
+        self.weights = nn.Parameter(
+            torch.randn(input_dim, units) / math.sqrt(input_dim),
+            requires_grad=True
+        )
+        # bias vector
+        self.bias = nn.Parameter(
+            torch.zeros(units),
+            requires_grad=True
+        )
+
+    def forward(self, inputs):
+        return inputs @ self.weights + self.bias
+```
+
+----
 
 ## Using it
 
@@ -386,10 +449,11 @@ y = linear_layer(x)
 
 ---
 
-#### A Better Way
+#### TensorFlow `build`
 
 * Know the # of nodes 
 * Don't know the input shape
+* More conventional
 
 ----
 
@@ -466,45 +530,7 @@ class LinearBlock(Layer):
 
 ---
 
-## Training (TF2.X)
-
-----
-
-#### Loss Functions
-
-```python
-# example loss function
-loss_fn = tf.keras.losses.MSELoss()
-```
-----
-
-#### Optimizers
-
-```python
-# example optimizer
-optimizer = tf.keras.optimizers.Adam()
-```
-
-----
-
-#### Full Training Loop (TF2.X)
-
-```python
-for x, y in dataset:
-    with tf.GradientTape() as tape:
-        # predictions for minibatch
-        preds = model(x)
-        # loss value for minibatch
-        loss = loss_fn(y, preds)
-    # find gradients
-    grads = tape.gradients(loss, model.trainable_weights)
-    # apply optimization
-    optimizer.apply_gradients(zip(grads, model.trainable_weights))
-```
-
----
-
-## Training PyTorch
+## Training TF2.X, PyTorch
 
 ----
 #### Losses
@@ -521,6 +547,8 @@ loss_fn = tf.keras.losses.MSELoss()
 ```
 
 ----
+#### Optimizers
+
 TensorFlow
 
 ```python
@@ -550,6 +578,23 @@ for x, y in dataset:
     loss.backward()
     # apply optimization
     optimizer.step()
+```
+
+----
+
+#### Full Training Loop (TF2.X)
+
+```python
+for x, y in dataset:
+    with tf.GradientTape() as tape:
+        # predictions for minibatch
+        preds = model(x)
+        # loss value for minibatch
+        loss = loss_fn(y, preds)
+    # find gradients
+    grads = tape.gradients(loss, model.trainable_weights)
+    # apply optimization
+    optimizer.apply_gradients(zip(grads, model.trainable_weights))
 ```
 
 ---
@@ -619,12 +664,39 @@ for x, y in dataset:
     opt.apply_gradients(zip(grads, model.trainable_weights))
 ```
 
+----
+### Compile Code
+
+* Use a decorator, `@tf.function`
+* Optional
+* Easy performance booster
+
+----
+#### Example - Graphs
+
+```python
+@tf.function
+def train_step(dataset):
+    for x, y in dataset:
+        with tf.GradientTape() as tape:
+            preds = mlp_model(x)            # predictions
+            loss = loss_fn(y, preds) 		# loss value
+            loss += sum(mlp_model.losses)	# extra losses
+        # find gradients
+        grads = tape.gradients(loss, model.trainable_weights)
+        # apply optimization
+        opt.apply_gradients(zip(grads, model.trainable_weights))
+        return loss
+```
+
+
 ---
 ## Model Class
 
 * Can do everything a `Layer` can do
 * Built-in functionality
 * a.k.a. Keras territory
+* TF and PyTorch part ways
 
 ----
 #### Definitions
@@ -668,3 +740,184 @@ model.fit(dataset, epochs=3)
 # Test Data
 loss, acc = model.evaluate(test_dataset)
 ```
+
+---
+## Functional Models
+
+
+* Creates DAG <!-- .element: class="fragment" data-fragment-index="1" -->
+* Model Class with Extras <!-- .element: class="fragment" data-fragment-index="2" -->
+* Only in TF <!-- .element: class="fragment" data-fragment-index="3" -->
+
+----
+
+<p align="center">
+  <img src="https://d3i71xaburhd42.cloudfront.net/896aa86d61a5dc506ee44fb5527988100a12e761/2-Figure1-1.png" alt="drawing" width="800"/>
+</p>
+
+----
+#### Simple Example 
+
+```python
+# input checks
+x = tf.keras.layers.Flatten(shape=28, 28))(inputs)
+# Layer 1
+x = tf.keras.layers.Dense(512, activation=tf.nn.relu)(inputs)
+# Layer 2
+x = tf.keras.layers.Dropout(0.2)(x)
+# outputs
+x = tf.keras.layers.Dense(10, activation=tf.nn.softmax)(x)
+# create model class
+model = tf.keras.Model(inputs, outputs)
+# compile
+model.compile(
+    optimizer='adam', 
+    loss='sparse_categorical_crossentropy',
+    metrics=['accuracy']
+)
+```
+
+----
+#### Example - Graph Output
+
+<p align="center">
+  <img src="https://miro.medium.com/max/2036/0*H5K5RhjSiEjZg5oU" alt="drawing" width="500"/>
+</p>
+
+----
+#### We can go crazy...
+<p align="center">
+  <img src="https://miro.medium.com/max/3200/0*eTqoj1dNmBZhuQvq" alt="drawing" width="900"/>
+</p>
+
+
+---
+
+## Sequential Models
+
+* Predifined <!-- .element: class="fragment" data-fragment-index="1" -->
+* PyTorch & TF <!-- .element: class="fragment" data-fragment-index="2" -->
+* In TF, Model class <!-- .element: class="fragment" data-fragment-index="3" -->
+
+----
+**PyTorch**
+
+```python
+model = nn.Sequential(
+  torch.nn.Linear(256),
+  F.reLU(),
+  torch.nn.Linear(256),
+  F.reLU(),
+  torch.nn.Linear(10),
+)
+```
+
+**TensorFlow**
+
+```python
+model = tf.keras.Sequential([
+  layers.Dense(256, activation=tf.nn.relu),
+  layers.Dense(256, activation=tf.nn.relu),
+  layers.Dense(10)
+])
+```
+
+---
+
+## Datasets
+
+* Convenience Functions
+* Take care of loading, iterations, batches
+
+----
+### Normally
+
+```python
+n_batches = (n_samples - 1) // batch_size + 1
+
+for idx in range(n_batches):
+    # get indices for batches
+    start_idx = idx * batch_size
+    end_idx   = start_idx + batch_size
+    # get subset from data
+    xbatch = x_train[start_idx:end_idx]
+    ybatch = y_train[start_idx:end_idx]
+```
+
+
+----
+### PyTorch - Datasets
+
+```python
+# create dataset
+train_ds = TensorDataset(x_train, y_train)
+# Loop through batches
+    for start_idx, end_idx in range(batch_idx):
+        # Use Dataset to store training data
+        xbatch, ybatch = train_ds[start_idx:end_idx]
+        # Do stuff...
+```
+
+Note: In PyTorch, the `Dataset` helps us to do index and slice through our data. It also can combine inputs and outputs so that we only have to slice through a single dataset. It can even convert your `np.ndarray` dataset to a Tensor automatically. 
+
+----
+### PyTorch - DataLoaders
+
+```python
+# create dataset
+train_ds = TensorDataset(x_train, y_train)
+# create dataloader
+train_dl = DataLoader(train_ds, batch_size=100)
+# Loop through batches
+    for xbatch, ybatch in train_dl:
+        # Do stuff...
+```
+
+
+----
+### TF - Both...
+
+```python
+# create dataset
+train_ds = tf.data.Dataset.from_tensor_slices(
+    (x_train, y_train)
+)
+# create dataloader
+train_dl = train_ds.batch(100)
+# Loop through batches
+    for xbatch, ybatch in train_dl:
+        # Do stuff...
+```
+
+---
+
+## What We Covered
+
+* DL Framework Idea
+* Layers and Models
+* Sequential Model
+
+----
+
+## What We didn't Cover
+
+* Callbacks
+* Distributed Training
+* Multiple GPUs
+* All options under the sun
+* Tensorboard (Built-in Jupyter Notebooks!)
+
+---
+## Summary
+
+<p align="center">
+  <img src="https://keras-dev.s3.amazonaws.com/tutorials-img/model-building-spectrum.png" alt="drawing" width="800"/>
+</p>
+
+----
+
+## TensorFlow Training
+
+<p align="center">
+  <img src="https://keras-dev.s3.amazonaws.com/tutorials-img/model-training-spectrum.png" alt="drawing" width="800"/>
+</p>
