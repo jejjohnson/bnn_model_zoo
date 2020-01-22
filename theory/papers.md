@@ -4,6 +4,10 @@ This page highlights some of the key papers that we will go over during the work
 
 !> **Warning**: This is not the final list. This is merely a guide that we will pivot off of.
 
+### Bayesian
+
+* The prior can generally only be understood in the context of the likelihood - Gelman et. al. (2017) - [arxiv](https://arxiv.org/abs/1708.07487) | [blog](https://statmodeling.stat.columbia.edu/2018/04/03/justify-my-love/)
+
 
 
 ### Introduction to Bayesian Deep Learning
