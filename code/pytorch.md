@@ -7,6 +7,9 @@
 ---
 ## Tutorials
 
+* PyTorch - Variables, Functionals and Autograd - [blog](https://jhui.github.io/2018/02/09/PyTorch-Variables-functionals-and-Autograd/)
+* [Research to Production: PyTorch JIT/TorchScript Updates](https://www.youtube.com/watch?v=St3gdHJzic0&feature=youtu.be&t=30) - Michael Suo, 2019
+
 ---
 ## Sample Code
 
